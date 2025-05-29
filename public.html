@@ -1,34 +1,87 @@
-<!-- public.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Public Feed</title>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <style>
+    body {
+      background: linear-gradient(to right, #d4fc79, #96e6a1);
+      font-family: 'Quicksand', sans-serif;
+    }
+    .container {
+      max-width: 700px;
+      margin: 50px auto;
+      background: white;
+      border-radius: 20px;
+      padding: 40px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      color: #2e7d32;
+      margin-bottom: 20px;
+    }
+    textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 1em;
+      resize: vertical;
+    }
+    button {
+      padding: 12px 20px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, #43a047, #66bb6a);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1em;
+    }
+    button:hover {
+      background: linear-gradient(135deg, #2e7d32, #43a047);
+    }
+    .post {
+      background: #e8f5e9;
+      margin-top: 20px;
+      border-left: 4px solid #81c784;
+      border-radius: 10px;
+      padding: 16px;
+    }
+    .post-user {
+      font-weight: bold;
+      color: #2e7d32;
+    }
+    .post-time {
+      color: #666;
+      font-size: 0.85em;
+      margin-top: 5px;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <!-- User info and logout -->
-    <div id="user-info" style="text-align: center; margin-bottom: 20px; color: #666;"></div>
-    <button id="logout-btn" style="float: right; margin-bottom: 20px;">Logout</button>
-    
+    <div id="user-info" style="text-align:center; color: #444;"></div>
+    <button id="logout-btn" style="float: right;">Logout</button>
     <h2>Public Feed</h2>
-    
-    <!-- Post creation section -->
-    <div id="post-section" style="margin-bottom: 30px;">
+
+    <div id="post-section">
       <h3>What's on your mind?</h3>
       <textarea id="post-text" placeholder="Share your thoughts..." rows="3"></textarea>
       <button id="post-btn">Post</button>
     </div>
-    
-    <!-- Posts display -->
+
     <div id="public-posts"></div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDK7S_Vi9JZrUq8SIRZG7e_yeuCX5RX7Lg",
@@ -47,25 +100,19 @@
     const logoutBtn = document.getElementById('logout-btn');
     const postBtn = document.getElementById('post-btn');
 
-    // Auth state handler
     auth.onAuthStateChanged(user => {
       if (user) {
         userInfo.textContent = `Logged in as: ${user.email}`;
         loadPublicPosts();
       } else {
-        // Redirect to login if not authenticated
         window.location.href = 'login.html';
       }
     });
 
-    // Logout handler
     logoutBtn.onclick = () => {
-      auth.signOut().then(() => {
-        window.location.href = 'index.html';
-      });
+      auth.signOut().then(() => window.location.href = 'index.html');
     };
 
-    // Post creation handler
     postBtn.onclick = () => {
       const text = document.getElementById('post-text').value.trim();
       const user = auth.currentUser;
@@ -95,7 +142,7 @@
           publicPostsDiv.innerHTML += `
             <div class="post">
               <div class="post-user">
-                <a href="profile.html?uid=${data.uid}" style="color: #1976d2; text-decoration: none;">
+                <a href="profile.html?uid=${data.uid}" style="color: #2e7d32; text-decoration: none;">
                   ${profile.displayName || data.user}
                 </a>
               </div>

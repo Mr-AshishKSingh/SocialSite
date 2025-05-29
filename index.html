@@ -1,4 +1,3 @@
-<!-- Revamped index.html with landing UI and auth check -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,71 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Welcome to Simple Social Media</title>
   <link rel="stylesheet" href="style.css"/>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600&display=swap" rel="stylesheet">
   <style>
     body {
-      background: linear-gradient(135deg, #1976d2, #42a5f5);
-      color: white;
-      text-align: center;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #FFDEE9, #B5FFFC);
+      font-family: 'Quicksand', sans-serif;
+      color: #333;
+      margin: 0;
+      padding: 0;
     }
     .landing-container {
       max-width: 600px;
       margin: 80px auto;
       padding: 40px;
-      background: rgba(255, 255, 255, 0.1);
+      background: white;
       border-radius: 20px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      text-align: center;
     }
-    .landing-container h1 {
+    h1 {
       font-size: 3em;
-      margin-bottom: 20px;
+      color: #6a1b9a;
     }
-    .landing-container p {
+    p {
       font-size: 1.2em;
       margin-bottom: 30px;
     }
     .start-btn {
       padding: 12px 30px;
-      font-size: 1.2em;
-      background-color: #ffffff;
-      color: #1976d2;
+      font-size: 1.1em;
+      background: linear-gradient(135deg, #ba68c8, #f48fb1);
+      color: white;
       border: none;
-      border-radius: 8px;
+      border-radius: 10px;
       cursor: pointer;
-      transition: all 0.3s ease;
+      transition: background 0.3s ease;
       margin: 0 10px;
     }
     .start-btn:hover {
-      background-color: #e3f2fd;
-    }
-    .auth-buttons {
-      display: none;
-    }
-    .welcome-back {
-      display: none;
+      background: linear-gradient(135deg, #8e24aa, #f06292);
     }
   </style>
 </head>
 <body>
   <div class="landing-container">
     <h1>Simple Social Media</h1>
-    <p>Connect. Share. Grow.<br> A simple and clean platform to share your thoughts with the world.</p>
-    
-    <!-- Show for new users -->
-    <div class="auth-buttons" id="auth-buttons">
+    <p>Connect. Share. Grow.<br> A vibrant platform to express yourself.</p>
+
+    <div id="auth-buttons" style="display:none">
       <button class="start-btn" onclick="window.location.href='login.html'">Login</button>
       <button class="start-btn" onclick="window.location.href='signup.html'">Sign Up</button>
     </div>
-    
-    <!-- Show for returning users -->
-    <div class="welcome-back" id="welcome-back">
+
+    <div id="welcome-back" style="display:none">
       <p>Welcome back!</p>
       <button class="start-btn" onclick="window.location.href='public.html'">Continue to Feed</button>
     </div>
   </div>
 
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyDK7S_Vi9JZrUq8SIRZG7e_yeuCX5RX7Lg",
@@ -83,14 +77,11 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // Check if user is already logged in
     auth.onAuthStateChanged(user => {
       if (user) {
-        // User is logged in, show welcome back message
         document.getElementById('welcome-back').style.display = 'block';
         document.getElementById('auth-buttons').style.display = 'none';
       } else {
-        // User is not logged in, show login/signup buttons
         document.getElementById('auth-buttons').style.display = 'block';
         document.getElementById('welcome-back').style.display = 'none';
       }
