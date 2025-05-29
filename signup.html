@@ -1,0 +1,56 @@
+<!-- signup.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Sign Up</h2>
+    <input type="email" id="signup-email" placeholder="Email" />
+    <input type="password" id="signup-password" placeholder="Password" />
+    <input type="text" id="signup-name" placeholder="Display Name" />
+    <input type="text" id="signup-bio" placeholder="Short Bio (optional)" />
+    <button id="signup-btn">Sign Up</button>
+    <p>Already have an account? <a href="login.html">Log in</a></p>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK7S_Vi9JZrUq8SIRZG7e_yeuCX5RX7Lg",
+      authDomain: "socialsite-project.firebaseapp.com",
+      projectId: "socialsite-project",
+      storageBucket: "socialsite-project.firebasestorage.app",
+      messagingSenderId: "470566554445",
+      appId: "1:470566554445:web:755f791512ab2b4c250504"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    document.getElementById("signup-btn").onclick = () => {
+      const email = document.getElementById("signup-email").value;
+      const password = document.getElementById("signup-password").value;
+      const name = document.getElementById("signup-name").value;
+      const bio = document.getElementById("signup-bio").value;
+
+      auth.createUserWithEmailAndPassword(email, password)
+        .then(cred => {
+          return db.collection("profiles").doc(cred.user.uid).set({
+            displayName: name,
+            bio: bio,
+            email: email
+          });
+        })
+        .then(() => window.location.href = "index.html")
+        .catch(err => alert(err.message));
+    };
+  </script>
+</body>
+</html>

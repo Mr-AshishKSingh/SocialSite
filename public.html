@@ -1,0 +1,60 @@
+<!-- public.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Public Feed</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>Public Feed</h2>
+    <div id="public-posts"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK7S_Vi9JZrUq8SIRZG7e_yeuCX5RX7Lg",
+      authDomain: "socialsite-project.firebaseapp.com",
+      projectId: "socialsite-project",
+      storageBucket: "socialsite-project.firebasestorage.app",
+      messagingSenderId: "470566554445",
+      appId: "1:470566554445:web:755f791512ab2b4c250504"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    const publicPostsDiv = document.getElementById('public-posts');
+
+    function loadPublicPosts() {
+      db.collection("posts").orderBy("created", "desc").onSnapshot(snapshot => {
+        publicPostsDiv.innerHTML = "";
+        snapshot.forEach(async doc => {
+          const data = doc.data();
+          const profileDoc = await db.collection('profiles').doc(data.uid).get();
+          const profile = profileDoc.exists ? profileDoc.data() : { displayName: data.user };
+          const time = data.created?.toDate().toLocaleString() || "";
+
+          publicPostsDiv.innerHTML += `
+            <div class="post">
+              <div class="post-user">
+                <a href="profile.html?uid=${data.uid}" style="color: #1976d2; text-decoration: none;">
+                  ${profile.displayName || data.user}
+                </a>
+              </div>
+              <div>${data.text}</div>
+              <div class="post-time">${time}</div>
+            </div>
+          `;
+        });
+      });
+    }
+
+    loadPublicPosts();
+  </script>
+</body>
+</html>

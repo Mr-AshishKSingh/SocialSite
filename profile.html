@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h2>User Profile</h2>
+    <div id="profile-data">
+      <p><strong>Name:</strong> <span id="profile-name"></span></p>
+      <p><strong>Bio:</strong> <span id="profile-bio"></span></p>
+      <button id="follow-btn" style="display: none;">Follow</button>
+      <button id="unfollow-btn" style="display: none;">Unfollow</button>
+    </div>
+    <hr>
+    <h3>Posts</h3>
+    <div id="user-posts"></div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDK7S_Vi9JZrUq8SIRZG7e_yeuCX5RX7Lg",
+      authDomain: "socialsite-project.firebaseapp.com",
+      projectId: "socialsite-project",
+      storageBucket: "socialsite-project.firebasestorage.app",
+      messagingSenderId: "470566554445",
+      appId: "1:470566554445:web:755f791512ab2b4c250504"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+
+    const params = new URLSearchParams(window.location.search);
+    const profileUid = params.get("uid");
+
+    const profileName = document.getElementById("profile-name");
+    const profileBio = document.getElementById("profile-bio");
+    const postsContainer = document.getElementById("user-posts");
+    const followBtn = document.getElementById("follow-btn");
+    const unfollowBtn = document.getElementById("unfollow-btn");
+
+    let currentUserUid = null;
+
+    auth.onAuthStateChanged(async user => {
+      if (!user || !profileUid) return;
+      currentUserUid = user.uid;
+
+      // Load profile
+      const profileDoc = await db.collection("profiles").doc(profileUid).get();
+      if (profileDoc.exists) {
+        const data = profileDoc.data();
+        profileName.textContent = data.displayName || "N/A";
+        profileBio.textContent = data.bio || "N/A";
+      }
+
+      // Load posts
+      db.collection("posts").where("uid", "==", profileUid).orderBy("created", "desc")
+        .onSnapshot(snapshot => {
+          postsContainer.innerHTML = "";
+          snapshot.forEach(doc => {
+            const post = doc.data();
+            const time = post.created?.toDate().toLocaleString() || "";
+            postsContainer.innerHTML += `
+              <div class="post">
+                <div>${post.text}</div>
+                <div class="post-time">${time}</div>
+              </div>
+            `;
+          });
+        });
+
+      // Show follow/unfollow if not your own profile
+      if (currentUserUid !== profileUid) {
+        const followRef = db.collection("follows").doc(currentUserUid);
+        const followSnap = await followRef.get();
+        const following = followSnap.exists ? followSnap.data().following || [] : [];
+
+        if (following.includes(profileUid)) {
+          unfollowBtn.style.display = "inline-block";
+        } else {
+          followBtn.style.display = "inline-block";
+        }
+
+        followBtn.onclick = async () => {
+          following.push(profileUid);
+          await followRef.set({ following });
+          followBtn.style.display = "none";
+          unfollowBtn.style.display = "inline-block";
+        };
+
+        unfollowBtn.onclick = async () => {
+          const updated = following.filter(id => id !== profileUid);
+          await followRef.set({ following: updated });
+          unfollowBtn.style.display = "none";
+          followBtn.style.display = "inline-block";
+        };
+      }
+    });
+  </script>
+</body>
+</html>
