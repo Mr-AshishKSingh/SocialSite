@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Simple Social Media</title>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <div class="container">
+    <h1>Simple Social Media</h1>
+    <div id="auth-section">
+      <input type="email" id="email" placeholder="Email" />
+      <input type="password" id="password" placeholder="Password" />
+      <button id="signup-btn">Sign Up</button>
+      <button id="login-btn">Log In</button>
+      <button id="logout-btn" style="display:none;">Log Out</button>
+      <div id="user-info"></div>
+    </div>
+
+    <div id="nav" style="display:none;">
+      <button onclick="showSection('post-section')">Post</button>
+      <button onclick="showSection('feed-section')">Feed</button>
+      <button onclick="showSection('profile-section')">Profile</button>
+    </div>
+
+    <div id="post-section" style="display:none;">
+      <textarea id="post-text" placeholder="What's on your mind?"></textarea>
+      <button id="post-btn">Post</button>
+    </div>
+
+    <div id="feed-section" style="display:none;">
+      <h3>All Users' Posts</h3>
+      <div id="posts"></div>
+    </div>
+
+    <div id="profile-section" style="display:none;">
+      <h3>My Profile</h3>
+      <input type="text" id="display-name" placeholder="Display Name">
+      <input type="text" id="bio" placeholder="Bio">
+      <button id="save-profile-btn">Save Profile</button>
+      <hr>
+      <div id="my-posts"></div>
+    </div>
+  </div>
+  <script src="app.js"></script>
+</body>
+</html>
