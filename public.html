@@ -12,7 +12,20 @@
 </head>
 <body>
   <div class="container">
+    <!-- User info and logout -->
+    <div id="user-info" style="text-align: center; margin-bottom: 20px; color: #666;"></div>
+    <button id="logout-btn" style="float: right; margin-bottom: 20px;">Logout</button>
+    
     <h2>Public Feed</h2>
+    
+    <!-- Post creation section -->
+    <div id="post-section" style="margin-bottom: 30px;">
+      <h3>What's on your mind?</h3>
+      <textarea id="post-text" placeholder="Share your thoughts..." rows="3"></textarea>
+      <button id="post-btn">Post</button>
+    </div>
+    
+    <!-- Posts display -->
     <div id="public-posts"></div>
   </div>
 
@@ -26,9 +39,49 @@
       appId: "1:470566554445:web:755f791512ab2b4c250504"
     };
     firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
     const db = firebase.firestore();
 
     const publicPostsDiv = document.getElementById('public-posts');
+    const userInfo = document.getElementById('user-info');
+    const logoutBtn = document.getElementById('logout-btn');
+    const postBtn = document.getElementById('post-btn');
+
+    // Auth state handler
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        userInfo.textContent = `Logged in as: ${user.email}`;
+        loadPublicPosts();
+      } else {
+        // Redirect to login if not authenticated
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Logout handler
+    logoutBtn.onclick = () => {
+      auth.signOut().then(() => {
+        window.location.href = 'index.html';
+      });
+    };
+
+    // Post creation handler
+    postBtn.onclick = () => {
+      const text = document.getElementById('post-text').value.trim();
+      const user = auth.currentUser;
+      if (text && user) {
+        db.collection('posts').add({
+          text,
+          user: user.email,
+          uid: user.uid,
+          created: firebase.firestore.FieldValue.serverTimestamp()
+        }).then(() => {
+          document.getElementById('post-text').value = "";
+        }).catch(err => alert(err.message));
+      } else {
+        alert("You need to be logged in and write something!");
+      }
+    };
 
     function loadPublicPosts() {
       db.collection("posts").orderBy("created", "desc").onSnapshot(snapshot => {
@@ -53,8 +106,6 @@
         });
       });
     }
-
-    loadPublicPosts();
   </script>
 </body>
 </html>
